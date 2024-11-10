@@ -60,6 +60,33 @@ def add_order(conn, order):
     cur.execute(sql, order)
     return cur.lastrowid
 
+def update(conn, table, id, **kwargs):
+    """
+    update kwote, status of a order
+    :param conn:
+    :param table: table name
+    :param id: row id 
+    :return:
+    """
+
+    parametres = [f"{k} = ?" for k in kwargs]
+    parametres = ", ".join(parametres)
+    values = tuple(v for v in kwargs.values()) + (id, )
+
+    id_column = "zamowienie_id" if table == "orders" else "klient_id"
+
+    sql = f''' UPDATE {table}
+                SET {parametres}
+                WHERE {id_column} = ?'''
+    
+    try:
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        conn.commit()
+        print(f'Udało się zmienić dane w tabeli {table}, id: {id}')
+    except sqlite3.OperationalError as e:
+        print(e)
+
 if __name__ == '__main__':
 
     create_clients_sql = """
