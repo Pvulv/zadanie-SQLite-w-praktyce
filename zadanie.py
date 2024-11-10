@@ -87,6 +87,37 @@ def update(conn, table, id, **kwargs):
     except sqlite3.OperationalError as e:
         print(e)
 
+def select_all(conn, table):
+   """
+   Query all rows in the table
+   :param conn:
+   :return:
+   """
+   cur = conn.cursor()
+   cur.execute(f"SELECT * FROM {table}")
+   rows = cur.fetchall()
+
+   print(rows)
+
+def select_where(conn, table, **query):
+   """
+   Query tasks from table with data from **query dict
+   :param conn:
+   :param table:
+   :param query:
+   :return:
+   """
+   cur = conn.cursor()
+   qs = []
+   values = ()
+   for k, v in query.items():
+       qs.append(f"{k}=?")
+       values += (v,)
+   q = " AND ".join(qs)
+   cur.execute(f"SELECT * FROM {table} WHERE {q}", values)
+   rows = cur.fetchall()
+   print(rows)
+
 if __name__ == '__main__':
 
     create_clients_sql = """
@@ -113,3 +144,21 @@ if __name__ == '__main__':
         CONSTRAINT unique_order UNIQUE(klient_id, data_zamowienia)
     );
     """
+    file = "zadanie.db"
+    conn = connection(file)
+
+    if conn is not None:
+        execute_sql(conn, create_clients_sql)
+        execute_sql(conn, create_orders_sql)
+
+    client_1 = ("Jan", "Kowalski", "jan.kowalski@email.com", "123-456-789",	"ul. Zielona 12, Warszawa",	"2023-01-15")
+    client_2 = ("Anna", "Nowak", "anna.nowak@email.com", "987-654-321", "ul. Kwiatowa 45, Kraków", "2023-02-20")
+    
+    client_id_1 = add_client(conn, client_1)
+    client_id_2 = add_client(conn, client_2)
+
+    order_1 = (client_id_1, "2023-03-01", 250.50, "zrealizowane")
+    order_2 = (client_id_2, "2023-04-10", 150.00, "w trakcie")
+    
+    add_order(conn, order_1)
+    add_order(conn, order_2)
