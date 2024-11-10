@@ -162,3 +162,11 @@ if __name__ == '__main__':
     
     add_order(conn, order_1)
     add_order(conn, order_2)
+        
+    update(conn, "orders", 2, status = "wysłane")
+
+    select_all(conn, "clients")
+    select_where(conn, "orders", status = "zrealizowane")
+
+    conn.commit()
+    conn.close()
