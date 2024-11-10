@@ -41,6 +41,25 @@ def add_client(conn, client):
     cur.execute(sql, client)
     return cur.lastrowid
 
+def add_order(conn, order):
+    """
+    Create a new order into the orders table
+    :param conn:
+    :param order:
+    :return: order id
+    """
+    klient_id = order[0]
+
+    if klient_id == 0:
+        print("Nie można dodać zamówienia dla klienta o ID 0.")
+        return None 
+    
+    sql = '''INSERT INTO orders(klient_id, data_zamowienia, kwota, status)
+            VALUES(?,?,?,?)'''
+    cur = conn.cursor()
+    cur.execute(sql, order)
+    return cur.lastrowid
+
 if __name__ == '__main__':
 
     create_clients_sql = """
@@ -53,5 +72,17 @@ if __name__ == '__main__':
         numer_tel VARCHAR(15) UNIQUE,
         adres VARCHAR(150),
         data DATE
+    );
+    """
+    create_orders_sql = """
+    -- orders table
+    CREATE TABLE IF NOT EXISTS orders (
+        zamowienie_id INTEGER PRIMARY KEY,
+        klient_id INTEGER,
+        data_zamowienia DATE,
+        kwota DECIMAL(10,2),
+        status TEXT NOT NULL,
+        FOREIGN KEY (klient_id) REFERENCES clients(klient_id)
+        CONSTRAINT unique_order UNIQUE(klient_id, data_zamowienia)
     );
     """
