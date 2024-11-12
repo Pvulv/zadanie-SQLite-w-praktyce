@@ -144,6 +144,18 @@ if __name__ == '__main__':
         CONSTRAINT unique_order UNIQUE(klient_id, data_zamowienia)
     );
     """
+    create_archived_orders_sql = """
+    -- archived_orders table
+    CREATE TABLE IF NOT EXISTS archived_orders (
+        zamowienie_id INTEGER PRIMARY KEY,
+        klient_id INTEGER,
+        data_zamowienia DATE,
+        kwota DECIMAL(10,2),
+        status TEXT NOT NULL,
+        FOREIGN KEY (klient_id) REFERENCES clients(klient_id)
+    );
+    """
+
     file = "zadanie.db"
     conn = connection(file)
 
