@@ -150,7 +150,7 @@ if __name__ == '__main__':
     create_clients_sql = """
     -- clients table
     CREATE TABLE IF NOT EXISTS clients (
-        klient_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        klient_id INTEGER PRIMARY KEY,
         imie TEXT NOT NULL,
         nazwisko TEXT NOT NULL,
         email TEXT,
@@ -189,6 +189,7 @@ if __name__ == '__main__':
     if conn is not None:
         execute_sql(conn, create_clients_sql)
         execute_sql(conn, create_orders_sql)
+        execute_sql(conn, create_archived_orders_sql)
 
     client_1 = ("Jan", "Kowalski", "jan.kowalski@email.com", "123-456-789",	"ul. Zielona 12, Warszawa",	"2023-01-15")
     client_2 = ("Anna", "Nowak", "anna.nowak@email.com", "987-654-321", "ul. Kwiatowa 45, Kraków", "2023-02-20")
@@ -205,7 +206,9 @@ if __name__ == '__main__':
     update(conn, "orders", 2, status = "wysłane")
 
     select_all(conn, "clients")
-    select_where(conn, "orders", status = "zrealizowane")
+    select_where(conn, "orders", status = "wysłane")
+
+    archive_order(conn)
 
     conn.commit()
     conn.close()
