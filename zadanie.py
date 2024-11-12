@@ -118,6 +118,33 @@ def select_where(conn, table, **query):
    rows = cur.fetchall()
    print(rows)
 
+def archive_order(conn):
+    """
+    Archive orders with status 'zrealizowane' by moving them to archived_orders and deleting from orders.
+    Show a message only if any orders were archived.
+    :param conn:
+    """
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM orders WHERE status = 'zrealizowane'")
+        orders_to_archive = cur.fetchall()
+
+        if not orders_to_archive:
+            print("Brak zamówień do archiwizacji.")
+            return
+
+        sql_insert = '''INSERT INTO archived_orders(zamowienie_id, klient_id, data_zamowienia, kwota, status)
+                        VALUES(?,?,?,?,?)'''
+        for order in orders_to_archive:
+            cur.execute(sql_insert, order)
+        
+        cur.execute("DELETE FROM orders WHERE status = 'zrealizowane'")
+        
+        conn.commit()
+        print("Zamówienia zostały zarchiwizowane.")
+    except Error as e:
+        print(f"Błąd archiwizacji zamówień: {e}")
+
 if __name__ == '__main__':
 
     create_clients_sql = """
